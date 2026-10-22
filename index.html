@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Para ti</title>
+<style>
+:root{
+  --bg:#2a0f2e; --surface:#3d1a42; --text:#fff3f0; --muted:#d9b8d4;
+  --accent:#ff6b8a; --accent-ink:#2a0f2e; --gold:#ffc86b;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ --bg:#2a0f2e; }
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{overflow-y:auto}
+body{
+  background:radial-gradient(circle at 50% 30%, #55205a 0%, var(--bg) 70%);
+  color:var(--text);
+  font-family:"Georgia","Times New Roman",serif;
+  display:flex;
+  text-align:center;
+}
+.screen{width:100%;max-width:440px;padding:24px;margin:auto}
+.hidden{display:none}
+
+/* Pantalla 1: contraseña */
+.lock h1{font-size:2rem;font-weight:400;margin:0 0 8px;line-height:1.2}
+.lock p{color:var(--muted);margin:0 0 28px}
+.field{display:flex;gap:8px}
+.field input{
+  flex:1;min-width:0;padding:14px 16px;font-size:1rem;
+  border:2px solid var(--surface);border-radius:12px;
+  background:var(--surface);color:var(--text);font-family:inherit;
+}
+.field input:focus{outline:3px solid var(--gold);outline-offset:2px}
+.field button{
+  padding:14px 20px;font-size:1rem;font-family:inherit;cursor:pointer;
+  border:0;border-radius:12px;background:var(--accent);color:var(--accent-ink);font-weight:700;
+}
+.field button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.error{color:var(--gold);min-height:1.4em;margin-top:12px;font-size:.95rem}
+.shake{animation:shake .4s}
+@keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+
+/* Pantalla 2: sorpresa */
+.surprise h1{font-size:2.4rem;font-weight:400;margin:0 0 16px}
+.surprise h1,.message{position:relative;z-index:1}
+.message{
+  font-size:1.1rem;line-height:1.6;margin:0;padding:22px 20px;
+  background:rgba(42,15,46,.82);border-radius:16px;
+}
+.message p{margin:0 0 14px}
+.message p:last-child{margin:0;font-size:1.3rem}
+#fx{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+.confetti{position:absolute;top:-16px;width:9px;height:14px;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(112vh) rotate(720deg)}}
+.heart,.balloon{position:absolute;bottom:-70px;animation:rise linear forwards}
+.balloon{font-size:46px}
+@keyframes rise{50%{margin-left:24px}to{transform:translateY(-118vh);margin-left:-12px}}
+
+@media (prefers-reduced-motion: reduce){ .shake{animation:none} #fx{display:none} }
+</style>
+</head>
+<body>
+
+<!-- PANTALLA 1: pide la contraseña -->
+<main class="screen lock" id="lock">
+  <h1>Tengo algo para ti</h1>
+  <p>Escribe la contraseña para abrirlo.</p>
+  <div class="field">
+    <input id="pw" type="password" placeholder="Contraseña" aria-label="Contraseña" autocomplete="off">
+    <button id="go">Abrir</button>
+  </div>
+  <div class="error" id="err" role="alert"></div>
+</main>
+
+<!-- PANTALLA 2: aparece después de la contraseña correcta -->
+<main class="screen surprise hidden" id="surprise">
+  <div id="fx" aria-hidden="true"></div>
+  <h1>¡Feliz cumpleaños, mi amor!</h1>
+
+  <div class="message" id="msg">
+    <p>Feliz cumpleaños, ojitos lindos. Tenerte a mi lado es una dicha. No sabes lo afortunado que soy de tenerte en mi vida, una fortuna que me hagas feliz con solo existir.</p>
+    <p>Deseo que cada deseo y cada meta que tengas se cumplan. Que Dios te bendiga siempre y que siempre seas muy feliz.</p>
+    <p>Te amo hoy y siempre ❤️🥰🎉😍</p>
+  </div>
+</main>
+
+<script>
+  // Cambia esta contraseña cuando la tengas
+  var PASSWORD = "24/12";
+
+  function startFx(){
+    var fx = document.getElementById("fx");
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    var colors = ["#ff6b8a","#ffc86b","#7bdff2","#b79ced","#9be564","#ffffff"];
+    var hearts = ["❤️","💖","💕","💗"];
+    function r(a,b){ return a + Math.random()*(b-a); }
+    function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+    function add(cls, txt, style, secs){
+      var e = document.createElement("span");
+      e.className = cls;
+      if (txt) e.textContent = txt;
+      for (var k in style) e.style[k] = style[k];
+      e.style.animationDuration = secs + "s";
+      fx.appendChild(e);
+      setTimeout(function(){ e.remove(); }, secs*1000 + 300);
+    }
+    function confetti(){ add("confetti","",{left:r(0,100)+"vw",background:pick(colors)}, r(3,6)); }
+    function heart(){ add("heart",pick(hearts),{left:r(0,95)+"vw",fontSize:r(18,36)+"px"}, r(6,10)); }
+    function balloon(){ add("balloon","🎈",{left:r(0,92)+"vw"}, r(8,12)); }
+    var i;
+    for (i=0;i<70;i++) setTimeout(confetti, r(0,1500));
+    for (i=0;i<8;i++) setTimeout(heart, r(0,2500));
+    for (i=0;i<5;i++) setTimeout(balloon, r(0,3000));
+    setInterval(confetti, 120);
+    setInterval(heart, 700);
+    setInterval(balloon, 2200);
+  }
+
+  var lock = document.getElementById("lock");
+  var surprise = document.getElementById("surprise");
+  var pw = document.getElementById("pw");
+  var err = document.getElementById("err");
+
+  function tryOpen(){
+    if (pw.value.trim().toLowerCase() === PASSWORD.toLowerCase()){
+      lock.classList.add("hidden");
+      surprise.classList.remove("hidden");
+      startFx();
+    } else {
+      err.textContent = "Esa no es. Inténtalo de nuevo.";
+      lock.classList.remove("shake");
+      void lock.offsetWidth;
+      lock.classList.add("shake");
+      pw.select();
+    }
+  }
+  document.getElementById("go").addEventListener("click", tryOpen);
+  pw.addEventListener("keydown", function(e){ if(e.key === "Enter") tryOpen(); });
+</script>
+</body>
+</html>
